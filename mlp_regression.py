@@ -143,26 +143,3 @@ for data in X_range_normalize:
 
 plotData(X, y, dataList, yValues)
 
-
-
-
-
-
-
-
-
-
-
-
-""" def conquer(s, start, end):
-    lenth = end - start + 1
-    if lenth != 1:
-        if end != s.size():
-            s = s[0:start] + s[start] + str(lenth) + s[end+1:]
-        else:
-            s = s[0:start] + s[start] + str(lenth)
-
-    print(s)
-
-
-conquer("aaffgg  ", 6, 7) """
