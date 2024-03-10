@@ -39,8 +39,6 @@ class myDataSet(Dataset):
         # Load Data into PyTorch Tensors
         self.features = torch.tensor(X, dtype=torch.float32)
         self.labels = torch.tensor(y, dtype=torch.float32)
-        print("shape of x tensor: ", self.features.shape)
-        print("shape of y tensor: ", self.labels.shape)
 
         self.features = self.features.view(-1, 1)  # reshape it into a tensor with column 1 and row -1. -1 means, that torch finds the number of rows on its own
 
@@ -58,7 +56,7 @@ trainDataSet = myDataSet(X_normal, y_normal)
 
 
 #------------Data Loader--------------#
-trainDataLoader = DataLoader(trainDataSet, batch_size=1, shuffle=True)
+trainDataLoader = DataLoader(trainDataSet, batch_size=10, shuffle=True)
 
 
 #------------NN-Model--------------#
@@ -80,13 +78,13 @@ class MLP_regression(torch.nn.Module):
 
 #--------Plot training Loss as a function of epoch-------#
     
-def plotLoss(epoch, loss):
-    plt.plot(epoch, loss, '.' ,label="Loss as a function of epoch")
+def plotLoss(epoch, loss, numEpochs):
+    plt.plot(epoch, loss ,label="Loss as a function of epoch")
     plt.xlabel("epoch")
     plt.ylabel("loss")
     plt.legend(loc='upper left')
-    plt.ylim(-1, 10)
-    plt.xlim(-1,100)
+    plt.ylim(-1, 2)
+    plt.xlim(-1,numEpochs)
     plt.grid()
     plt.show()
 
@@ -99,7 +97,7 @@ model = MLP_regression(num_features=1)
 torch.manual_seed(123)
 optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
-numEpochs = 100
+numEpochs = 500
 
 
 lossList = []
@@ -109,11 +107,11 @@ for epoch in range(numEpochs):
     model = model.train()
     
     for batch_idx, (features, classLables) in enumerate(trainDataLoader):
+        # update the parameters after every batch_size
 
         yPredict = model(features)  # calls the forward() method on the model
 
         loss = F.mse_loss(yPredict, classLables.view(yPredict.shape))
-        #loss = F.mse_loss(classLables.view(yPredict.shape), yPredict)
 
         optimizer.zero_grad()
         loss.backward()
@@ -124,7 +122,7 @@ for epoch in range(numEpochs):
     epochList.append(epoch)
 
 
-#plotLoss(epochList, lossList)
+plotLoss(epochList, lossList, numEpochs)
 
 
 #-------Evaluate Model and plot regression curve--------#
@@ -139,9 +137,9 @@ dataList = []
 for data in X_range_normalize:
     yResult = model(data)
 
-    yValue = (yResult.item() *  y.std()) + y.mean()  #un-normalize
+    yValue = (yResult.item() *  y.std()) + y.mean()  #un-normalize y value
     yValues.append(yValue)
-    dataList.append((data *  X.std()) + X.mean())    #un-normalize
+    dataList.append((data *  X.std()) + X.mean())    #un-normalize x value
 
 plotData(X, y, dataList, yValues)
 
